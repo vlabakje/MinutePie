@@ -74,8 +74,6 @@ class StepsDial extends Dial {
 
     function update(stepCount, stepGoal){
         var sixty = stepCount * 60 / stepGoal;
-        //sixty = sixty.toNumber();
-        System.println("current sixty " + sixty);
         if(sixty != current){
             clear();
             if(sixty > 59){
