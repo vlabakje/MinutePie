@@ -10,6 +10,7 @@ class Dial {
         radius = mradius;
         dc = mdc;
         current = 0;
+        clear();
     }
 
     function clear(){
