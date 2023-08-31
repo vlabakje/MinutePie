@@ -1,5 +1,5 @@
 const MARKERLENGTH=6;
-const MARKERWIDTH=6;
+const MARKERWIDTH=4;
 
 class MinutePieSubdialsLayer{
     //hidden var maxX, maxY, centerX, centerY, currentMinute;
@@ -46,7 +46,11 @@ class MinutePieSubdialsLayer{
         dayDial.markers(dc);
         stepsDial.markers(dc);
         dc.setPenWidth(MARKERWIDTH);
-        dc.drawLine(centerX, 0, centerX, MARKERLENGTH); // 12
+        dc.fillPolygon([
+            [centerX, MARKERLENGTH*2], // bottom point
+            [centerX-MARKERLENGTH, 0], // top left
+            [centerX+MARKERLENGTH, 0] // top right
+        ]);
         dc.drawLine(maxX, centerY, maxX-MARKERLENGTH, centerY); // 3
         dc.drawLine(centerX, maxY, centerX, maxY-MARKERLENGTH); // 6
         dc.drawLine(0, centerY, MARKERLENGTH, centerY); // 9
