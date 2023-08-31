@@ -1,7 +1,7 @@
 import Toybox.Lang;
 
 const MARKERLENGTH=6;
-const MARKERWIDTH=4;
+const MARKERWIDTH=5;
 
 class MinutePieSubdialsLayer{
     hidden var hourDial, secondsDial, stepsDial, dayDial;
@@ -14,6 +14,7 @@ class MinutePieSubdialsLayer{
              //:palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_WHITE, Graphics.COLOR_BLACK],
              //:colorDepth=>4});
         var dc = buffer.get().getDc();
+        dc.setAntiAlias(true);
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         hourDial = new HourDial(centerX, centerY, centerX/2.7, dc);
         secondsDial = new SecondsDial(centerX, maxY*0.85, centerX/5, dc);
@@ -51,10 +52,13 @@ class MarkersLayer {
     function initialize(subdials as Array<Dial>){
         buffer = Graphics.createBufferedBitmap(
             {:width=>maxX,
-             :height=>maxY,
-             :palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_ORANGE],
-             :colorDepth=>2});
+             :height=>maxY});
+            // for lower memory usage, results in a weird line artifact near the 12 o'clock marker
+            //  :palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_ORANGE],
+            //  :colorDepth=>2});
         var dc = buffer.get().getDc();
+        dc.setAntiAlias(true);
+        dc.setColor(Graphics.COLOR_ORANGE, Graphics.COLOR_TRANSPARENT);
         for(var i=0; i<subdials.size(); i++){
             subdials[i].markers(dc);
         }
@@ -64,9 +68,9 @@ class MarkersLayer {
     function mainMarkers(dc){
         dc.setPenWidth(MARKERWIDTH);
         dc.fillPolygon([
-            [centerX, MARKERLENGTH*3], // bottom point
-            [centerX-MARKERLENGTH, 0], // top left
-            [centerX+MARKERLENGTH, 0] // top right
+            [centerX-(MARKERLENGTH*2), 0], // top left
+            [centerX+(MARKERLENGTH*2), 0], // top right
+            [centerX, MARKERLENGTH*4] // bottom point
         ]);
         var angle, edge, inner;
         for(var i=0; i < 12; i++){
@@ -75,7 +79,6 @@ class MarkersLayer {
             inner = getPointOnCircle(angle, centerX-MARKERLENGTH);
             dc.drawLine(edge[0], edge[1], inner[0], inner[1]);
         }
-        dc.setPenWidth(1);        
     }
     
     hidden function getPointOnCircle(angle, radius) as Array<Number>{

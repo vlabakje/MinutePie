@@ -31,6 +31,7 @@ class MinutePieView extends WatchUi.WatchFace {
         centerX = maxX/2;
         centerY = maxY/2;
         dc.setPenWidth(centerX);
+        dc.setAntiAlias(true);
         subdialsLayer = new MinutePieSubdialsLayer();
         markersLayer = new MarkersLayer(subdialsLayer.subdials());
     }
@@ -43,7 +44,6 @@ class MinutePieView extends WatchUi.WatchFace {
 
     // Clear the screen
     hidden function clear(dc, min) {
-        //dc.setClip(minX, minY, maxX, maxY);
         dc.clearClip();
         if(!sleeping || min == 0){
             dc.setColor(FOREGROUND_COLOR, BACKGROUND_COLOR);
@@ -64,19 +64,17 @@ class MinutePieView extends WatchUi.WatchFace {
         subdialsLayer.update(now.hour, now.sec, now.day, info.steps, info.stepGoal);
         dc.drawBitmap(0, 0, subdialsLayer.buffer.get());
         dc.drawBitmap(0, 0, markersLayer.buffer.get());
-        //drawSmallPie(dc, info.steps, info.stepGoal - 0.1, maxX * 0.2);
         if(sleeping){
             subdialsLayer.setClip(dc);
         }
     }
 
     function onPartialUpdate(dc as Dc) as Void {
-        // seconds
         var clockTime = System.getClockTime();
-        System.println("low power update " + clockTime.sec);
+        //System.println("low power update " + clockTime.sec);
         subdialsLayer.partialUpdate(clockTime.sec);
         dc.drawBitmap(0, 0, subdialsLayer.buffer.get());
-        dc.drawBitmap(0, 0, subdialsLayer.markers.get());
+        dc.drawBitmap(0, 0, markersLayer.buffer.get());
     }
 
     // Called when this View is removed from the screen. Save the
@@ -117,6 +115,7 @@ class MinutePieDelegate extends WatchUi.WatchFaceDelegate {
     }
 
     function onPowerBudgetExceeded(powerInfo) {
+        // todo: set flag and indicate on watchface
         System.println( "Average execution time: " + powerInfo.executionTimeAverage );
         System.println( "Allowed execution time: " + powerInfo.executionTimeLimit );
     }
