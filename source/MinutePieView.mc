@@ -41,12 +41,11 @@ class MinutePieView extends WatchUi.WatchFace {
     }
 
     // Clear the screen
-    hidden function clear(dc) {
+    hidden function clear(dc, min) {
         //dc.setClip(minX, minY, maxX, maxY);
         dc.clearClip();
-        if(!sleeping){
+        if(!sleeping || min == 0){
             dc.setColor(FOREGROUND_COLOR, BACKGROUND_COLOR);
-            
             dc.clear();
         }
     }
@@ -55,11 +54,11 @@ class MinutePieView extends WatchUi.WatchFace {
     function onUpdate(dc as Dc) as Void {
         var now = Time.Gregorian.info(Time.now(), Time.FORMAT_LONG);
         var info = ActivityMonitor.getInfo();
-        if(sleeping){
+        /*if(sleeping){
             System.println("sleepy update " + now.min + "." + now.sec);
-        }
+        }*/
         // Get and show the current time
-        clear(dc);
+        clear(dc, now.min);
         updateMinute(dc, now.min);
         subdialsLayer.update(now.hour, now.sec, now.day, info.steps, info.stepGoal);
         dc.drawBitmap(0, 0, subdialsLayer.buffer.get());
@@ -106,8 +105,6 @@ class MinutePieView extends WatchUi.WatchFace {
             } else {
                 dc.drawArc(centerX, centerY, centerX/2.0, Graphics.ARC_CLOCKWISE, 90, sixtyAngles[minute]);
             }
-        } else {
-            dc.drawCircle(centerX, centerY, centerX);
         }
     }
 }
