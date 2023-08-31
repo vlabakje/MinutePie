@@ -45,6 +45,10 @@ class HourDial extends Dial {
             current = hour;
         }
     }
+
+    function markers(dc){
+        // no markers for the hour subdial
+    }
 }
 
 class DayDial extends Dial {
