@@ -4,7 +4,6 @@ const MARKERLENGTH=6;
 const MARKERWIDTH=4;
 
 class MinutePieSubdialsLayer{
-    //hidden var maxX, maxY, centerX, centerY, currentMinute;
     hidden var hourDial, secondsDial, stepsDial, dayDial;
     var buffer;
 
@@ -53,7 +52,7 @@ class MarkersLayer {
         buffer = Graphics.createBufferedBitmap(
             {:width=>maxX,
              :height=>maxY,
-             :palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_RED],
+             :palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_ORANGE],
              :colorDepth=>2});
         var dc = buffer.get().getDc();
         for(var i=0; i<subdials.size(); i++){
@@ -65,13 +64,23 @@ class MarkersLayer {
     function mainMarkers(dc){
         dc.setPenWidth(MARKERWIDTH);
         dc.fillPolygon([
-            [centerX, MARKERLENGTH*2], // bottom point
+            [centerX, MARKERLENGTH*3], // bottom point
             [centerX-MARKERLENGTH, 0], // top left
             [centerX+MARKERLENGTH, 0] // top right
         ]);
-        dc.drawLine(maxX, centerY, maxX-MARKERLENGTH, centerY); // 3
-        dc.drawLine(centerX, maxY, centerX, maxY-MARKERLENGTH); // 6
-        dc.drawLine(0, centerY, MARKERLENGTH, centerY); // 9
+        var angle, edge, inner;
+        for(var i=0; i < 12; i++){
+            angle = i * Math.PI / 6.0;
+            edge = getPointOnCircle(angle, centerX);
+            inner = getPointOnCircle(angle, centerX-MARKERLENGTH);
+            dc.drawLine(edge[0], edge[1], inner[0], inner[1]);
+        }
         dc.setPenWidth(1);        
+    }
+    
+    hidden function getPointOnCircle(angle, radius) as Array<Number>{
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+    	return [ centerX + (sin * radius), centerY - (cos * radius) ];
     }
 }
