@@ -1,3 +1,5 @@
+import Toybox.Lang;
+
 const MARKERLENGTH=6;
 const MARKERWIDTH=4;
 
@@ -5,7 +7,6 @@ class MinutePieSubdialsLayer{
     //hidden var maxX, maxY, centerX, centerY, currentMinute;
     hidden var hourDial, secondsDial, stepsDial, dayDial;
     var buffer;
-    var markers;
 
     function initialize(){
         buffer = Graphics.createBufferedBitmap(
@@ -19,7 +20,6 @@ class MinutePieSubdialsLayer{
         secondsDial = new SecondsDial(centerX, maxY*0.85, centerX/5, dc);
         stepsDial = new StepsDial(maxX*0.15, centerY, centerX/5, dc);
         dayDial = new DayDial(maxX*0.85, centerY, centerX/5, dc);
-        markerDial();
     }
     
     function update(hour, seconds, day, stepCount, stepGoal){
@@ -33,18 +33,36 @@ class MinutePieSubdialsLayer{
         secondsDial.partialUpdate(seconds);
     }
 
-    function markerDial(){
-        markers = Graphics.createBufferedBitmap(
+    function subdials() as Array<Dial>{
+        return [hourDial, secondsDial, dayDial, stepsDial];
+    }
+
+    // for sleeping mode we need to set a clip for the rectangle around the seconds dial
+    function setClip(dc){
+        dc.setClip(secondsDial.x-secondsDial.radius,
+                   secondsDial.y-secondsDial.radius,
+                   secondsDial.x+secondsDial.radius,
+                   secondsDial.y+secondsDial.radius);
+    }
+}
+
+class MarkersLayer {
+    var buffer;
+
+    function initialize(subdials as Array<Dial>){
+        buffer = Graphics.createBufferedBitmap(
             {:width=>maxX,
              :height=>maxY,
              :palette=>[Graphics.COLOR_TRANSPARENT, Graphics.COLOR_RED],
              :colorDepth=>2});
-        var dc = markers.get().getDc();
-        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-        hourDial.markers(dc);
-        secondsDial.markers(dc);
-        dayDial.markers(dc);
-        stepsDial.markers(dc);
+        var dc = buffer.get().getDc();
+        for(var i=0; i<subdials.size(); i++){
+            subdials[i].markers(dc);
+        }
+        mainMarkers(dc);
+    }
+
+    function mainMarkers(dc){
         dc.setPenWidth(MARKERWIDTH);
         dc.fillPolygon([
             [centerX, MARKERLENGTH*2], // bottom point
@@ -54,13 +72,6 @@ class MinutePieSubdialsLayer{
         dc.drawLine(maxX, centerY, maxX-MARKERLENGTH, centerY); // 3
         dc.drawLine(centerX, maxY, centerX, maxY-MARKERLENGTH); // 6
         dc.drawLine(0, centerY, MARKERLENGTH, centerY); // 9
-        dc.setPenWidth(1);
-    }
-
-    function setClip(dc){
-        dc.setClip(secondsDial.x-secondsDial.radius,
-                   secondsDial.y-secondsDial.radius,
-                   secondsDial.x+secondsDial.radius,
-                   secondsDial.y+secondsDial.radius);
+        dc.setPenWidth(1);        
     }
 }

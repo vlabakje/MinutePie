@@ -12,7 +12,7 @@ var maxX, maxY, centerX, centerY;
 
 class MinutePieView extends WatchUi.WatchFace {
     hidden var sleeping;
-    hidden var subdialsLayer;
+    hidden var subdialsLayer, markersLayer;
 
     function initialize() {
         WatchFace.initialize();
@@ -32,6 +32,7 @@ class MinutePieView extends WatchUi.WatchFace {
         centerY = maxY/2;
         dc.setPenWidth(centerX);
         subdialsLayer = new MinutePieSubdialsLayer();
+        markersLayer = new MarkersLayer(subdialsLayer.subdials());
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -62,7 +63,7 @@ class MinutePieView extends WatchUi.WatchFace {
         updateMinute(dc, now.min);
         subdialsLayer.update(now.hour, now.sec, now.day, info.steps, info.stepGoal);
         dc.drawBitmap(0, 0, subdialsLayer.buffer.get());
-        dc.drawBitmap(0, 0, subdialsLayer.markers.get());
+        dc.drawBitmap(0, 0, markersLayer.buffer.get());
         //drawSmallPie(dc, info.steps, info.stepGoal - 0.1, maxX * 0.2);
         if(sleeping){
             subdialsLayer.setClip(dc);
