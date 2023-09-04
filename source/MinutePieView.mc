@@ -8,11 +8,13 @@ import Toybox.WatchUi;
 var sixtyAngles as Array<Float> = new Array<Float>[60];
 const FOREGROUND_COLOR    = Graphics.COLOR_WHITE;
 const BACKGROUND_COLOR    = Graphics.COLOR_BLACK;
+// global constants for screen size
 var maxX, maxY, centerX, centerY;
 
 class MinutePieView extends WatchUi.WatchFace {
     hidden var sleeping;
     hidden var subdialsLayer, markersLayer;
+    hidden var is24Hour = false;
 
     function initialize() {
         WatchFace.initialize();
@@ -26,6 +28,7 @@ class MinutePieView extends WatchUi.WatchFace {
     // Load your resources here
     function onLayout(dc as Dc) as Void {
         var settings = System.getDeviceSettings();
+        is24Hour = settings.is24Hour;
         maxX = settings.screenWidth;
         maxY = settings.screenHeight;
         centerX = maxX/2;
@@ -61,7 +64,7 @@ class MinutePieView extends WatchUi.WatchFace {
         // Get and show the current time
         clear(dc, now.min);
         updateMinute(dc, now.min);
-        subdialsLayer.update(now.hour, now.sec, now.day, info.steps, info.stepGoal);
+        subdialsLayer.update(getHour(now), now.sec, now.day, info.steps, info.stepGoal);
         dc.drawBitmap(0, 0, subdialsLayer.buffer.get());
         dc.drawBitmap(0, 0, markersLayer.buffer.get());
         if(sleeping){
@@ -105,6 +108,13 @@ class MinutePieView extends WatchUi.WatchFace {
                 dc.drawArc(centerX, centerY, centerX/2.0, Graphics.ARC_CLOCKWISE, 90, sixtyAngles[minute]);
             }
         }
+    }
+
+    hidden function getHour(now as Time.Gregorian.Info){
+        if(!is24Hour){
+            return now.hour % 12;
+        }
+        return now.hour;
     }
 }
 
