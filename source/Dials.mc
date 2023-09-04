@@ -68,11 +68,15 @@ class DayDial extends Dial {
 }
 
 class StepsDial extends Dial {
+    hidden var icon;
+
     function initialize(x, y, radius, dc){
-        Dial.initialize(x, y, radius, dc);
+        Dial.initialize(x, y, radius, dc);    
+        icon = WatchUi.loadResource(Rez.Drawables.StepsIcon);
     }
 
     function update(stepCount, stepGoal){
+        //dc.drawBitmap(x-(icon.getWidth()/2), y-(icon.getHeight()/2), icon);
         var sixty = stepCount * 60 / stepGoal;
         if(sixty != current){
             clear();
@@ -88,6 +92,7 @@ class StepsDial extends Dial {
     function markers(dc){
         Dial.markers(dc);
         Dial.ticks(dc);
+        dc.drawBitmap(x-(icon.getWidth()/2), y-(icon.getHeight()/2), icon);
     }
 }
 
